@@ -1,7 +1,7 @@
 // functions/api/admin/results.js
 
-const connectToDatabase = require('./utils/db');
-const Test = require('./models/Test');
+const connectToDatabase = require('./db');
+const Test = require('./models-Test');
 const mongoose = require('mongoose');
 
 exports.handler = async (event, context) => {
