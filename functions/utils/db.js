@@ -8,7 +8,7 @@ let cachedDb = null;
 // Ma'lumotlar bazasiga ulanish funksiyasi
 async function connectToDatabase() {
     // MongoDB Atlas Connection String Netlify Environment Variables orqali olinadi
-    const DB_URI = process.env.MONGODB_URI;
+    const DB_URI = process.MONGODB_URI;
 
     if (!DB_URI) {
         throw new Error('MONGODB_URI environment variable not set.');
