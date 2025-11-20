@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Imtihon tizimi</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:-apple-system,system-ui,sans-serif;
+      background:#eef1f7;
+      color:#1e293b;
+      height:100vh;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* =========================
+       GLOBAL PAGE STYLE
+    ========================== */
+    .page{display:none;flex-direction:column;height:100%}
+    .page.active{display:flex}
+
+    /* =========================
+       HEADER (YANGI DIZAYN)
+    ========================== */
+    .header{
+      padding:16px;
+      background:linear-gradient(135deg,#4b6bff,#233bff);
+      color:#fff;
+      text-align:center;
+      font-size:20px;
+      font-weight:700;
+      position:relative;
+      box-shadow:0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .back-btn{
+      position:absolute;
+      left:14px;
+      top:16px;
+      background:none;
+      border:none;
+      color:#fff;
+      font-size:26px;
+      cursor:pointer;
+    }
+
+    /* =========================
+       PDF (toolbar O‘CHIRILDI)
+    ========================== */
+    .pdf{
+      flex:1;
+      overflow:auto;
+      background:#fff;
+      padding:8px;
+    }
+    .pdf embed{
+      width:100%;
+      height:100%;
+      border-radius:14px;
+      pointer-events:auto;
+    }
+    /* PDF toolbarni o‘chirib qo‘yish */
+    embed::-webkit-media-controls-enclosure { display:none !important; }
+    embed::-webkit-media-controls-panel { display:none !important; }
+
+    /* =========================
+       BUTTONS
+    ========================== */
+    .btn{
+      padding:15px 20px;
+      background:#4b6bff;
+      color:#fff;border:none;
+      border-radius:14px;
+      font-size:17px;
+      margin:12px 16px;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(75,107,255,0.3);
+    }
+    .btn.red{background:#e11d48}
+    .btn.green{background:#00b56a}
+    .btn.small{
+      padding:10px 16px;
+      font-size:15px;
+      margin:6px
+    }
+
+    input, select{
+      padding:15px;
+      border:2px solid #d6d9e4;
+      border-radius:14px;
+      margin:8px 16px;
+      font-size:16px;
+      background:#fff;
+    }
+    label{
+      display:block;
+      margin:16px 16px 6px;
+      font-weight:600;
+      color:#334155;
+    }
+
+    .card{
+      background:#fff;
+      padding:16px;
+      margin:12px;
+      border-radius:16px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.08)
+    }
+
+    /* =========================
+       OPTIONS (A B C D E)
+    ========================== */
+    .opts{
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      padding:10px;
+    }
+    .o{
+      width:52px;height:52px;
+      border:3.5px solid #cbd5e1;
+      background:#fff;
+      border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:28px;font-weight:900;
+      cursor:pointer;
+      transition:all .25s;
+    }
+    .o.square{border-radius:15px}
+
+    .o.circle.active{
+      background:#4b6bff;color:#fff;border-color:#4b6bff;
+      transform:scale(1.18);
+      box-shadow:0 8px 25px rgba(75,107,255,0.45);
+    }
+
+    .o.square.active{
+      background:#00b56a;color:#fff;border-color:#00b56a;
+      transform:scale(1.18);
+      box-shadow:0 8px 25px rgba(0,181,106,0.45);
+    }
+
+    /* =========================
+       BOTTOM NAV
+    ========================== */
+    .nav{
+      padding:12px 16px;
+      background:#fff;
+      overflow-x:auto;
+      border-top:1px solid #e2e8f0;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      box-shadow:0 -4px 10px rgba(0,0,0,0.05);
+    }
+
+    .navs{
+      display:inline-grid;
+      grid-auto-flow:column;
+      grid-auto-columns:40px;
+      gap:9px;
+    }
+
+    .n{
+      width:40px;height:40px;
+      border-radius:12px;
+      background:#e2e8f0;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:700;font-size:14px;
+      cursor:pointer;
+    }
+    .n.active{
+      background:#4b6bff;color:#fff;transform:scale(1.1)
+    }
+    .n.done{background:#00b56a;color:#fff}
+    .n.wrong{background:#e11d48;color:#fff}
+
+    /* =========================
+       ADMIN TOOLS
+    ========================== */
+    .admin-tools{
+      display:flex;justify-content:center;gap:18px;margin:14px 0
+    }
+    .tool{
+      width:60px;height:60px;border-radius:50%;
+      background:#fff;border:4px solid #cbd5e1;
+      display:flex;align-items:center;justify-content:center;
+      font-size:32px;
+      cursor:pointer;
+      box-shadow:0 6px 20px rgba(0,0,0,0.1);
+      transition:.2s
+    }
+    .tool.active{
+      border-color:#4b6bff;background:#eef2ff;
+    }
+
+    .result-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(40px,1fr));
+      gap:10px;margin:20px 0
+    }
+  </style>
+</head>
+<body>
+
+<!-- 1. Bosh sahifa -->
+<div id="start" class="page active">
+  <div class="header">Imtihon tizimi</div>
+  <div style="flex:1;padding:30px;text-align:center">
+    <h2 style="margin-bottom:30px">Assalomu alaykum!</h2>
+    <input type="text" id="code-input" placeholder="Imtihon kodi (masalan: 123456)">
+    <button class="btn" onclick="enterByCode()">Kirish</button>
+    <button class="btn red" id="admin-login-btn" style="display:none;" onclick="go('admin-dash'); loadTests()">Admin Dashboard</button>
+  </div>
+</div>
+
+<!-- 3. Admin dashboard -->
+<div id="admin-dash" class="page">
+  <div class="header"><button class="back-btn" onclick="logout()"><i class="fa-solid fa-angle-left"></i></button>Mening imtihonlarim</div>
+  <div id="tests-list" style="flex:1;overflow:auto;padding:10px"></div>
+  <button class="btn" onclick="go('create-1')">+ Yangi imtihon yaratish</button>
+</div>
+
+<!-- 4. Test yaratish 1-qadam -->
+<div id="create-1" class="page">
+  <div class="header"><button class="back-btn" onclick="go('admin-dash')"><i class="fa-solid fa-angle-left"></i></button>Yangi imtihon</div>
+  <div class="card">
+    <label>Imtihon nomi</label>
+    <input type="text" id="test-name">
+    <label>Umumiy material (PDF)</label>
+    <input type="file" accept=".pdf" id="test-pdf">
+    <label>Javob variantlari</label>
+    <select id="answers-count"><option value="4">4 ta (A-D)</option><option value="5" selected>5 ta (A-E)</option></select>
+    <label>Savollar soni</label>
+    <input type="number" id="q-count" value="30" min="5" max="200">
+    <button class="btn" onclick="nextStep()">Keyingi qadam <i class="fa-solid fa-angle-right"></i></button>
+  </div>
+</div>
+
+<!-- 5. Test yaratish 2-qadam -->
+<div id="create-2" class="page">
+  <div class="header"><button class="back-btn" onclick="go('admin-dash')"><i class="fa-solid fa-angle-left"></i></button>To‘g‘ri javoblarni belgilang</div>
+  <div class="pdf"><embed id="admin-pdf"></div>
+  <div style="background:#fff;padding:12px 16px">
+    <div style="text-align:center;font-weight:700;margin-bottom:10px">Savol <span id="admin-q">1</span></div>
+    <div class="admin-tools">
+      <div class="tool active" onclick="setType('single')"><i class="fa-regular fa-circle-check"></i></div>
+      <div class="tool" onclick="setType('multiple')"><i class="fa-regular fa-square-check"></i></div>
+      <div class="tool" onclick="setType('text')"><i class="fa-solid fa-pen-fancy"></i></div>
+    </div>
+    <div class="opts" id="admin-opts"></div>
+    <div id="admin-textbox" style="display:none;margin-top:12px">
+      <input type="text" id="admin-text" placeholder="To‘g‘ri javobni yozing...">
+      <button class="btn green" onclick="saveTextAnswer()">Saqlash</button>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="navs" id="admin-nav"></div>
+    <button class="btn red" onclick="saveTest()">SAQLASH</button>
+  </div>
+</div>
+
+<!-- 6. Talaba testi -->
+<div id="student-test" class="page">
+  <div class="pdf"><embed id="student-pdf"></div>
+  <div style="background:#fff;padding:12px 16px">
+    <div style="text-align:center;font-weight:700;margin-bottom:8px">Savol <span id="s-q">1</span> / <span id="s-total">30</span></div>
+    <div class="opts" id="s-opts"></div>
+    <div id="s-textbox" style="display:none;margin-top:10px">
+      <input type="text" id="s-text" placeholder="Javobingizni yozing...">
+      <button class="btn" onclick="saveStudentText()">Saqlash</button>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="navs" id="s-nav"></div>
+    <button class="btn red" onclick="finishTest()">Tugatish</button>
+  </div>
+</div>
+
+<!-- 7. Talaba natijasi -->
+<div id="student-result" class="page">
+  <div class="header">Sizning natijangiz</div>
+  <div style="flex:1;text-align:center;padding:30px">
+    <h1 style="font-size:64px;margin:20px 0" id="perc">87%</h1>
+    <p style="font-size:18px">To‘g‘ri: <b id="cor">26</b> • Xato: <b id="wr">4</b></p>
+    <div class="result-grid" id="result-grid"></div>
+    <button class="btn" onclick="go('start')">Bosh sahifa</button>
+  </div>
+</div>
+
+<!-- 8. Admin natijalar -->
+<div id="admin-results" class="page">
+  <div class="header"><button class="back-btn" onclick="go('admin-dash')"><i class="fa-solid fa-angle-left"></i></button>Natijalar</div>
+  <div style="flex:1;overflow:auto;padding:10px" id="results-list"></div>
+</div>
+
+<!-- 9. Test yaratildi -->
+<div id="test-created" class="page">
+  <div class="header">Imtihon yaratildi!</div>
+  <div style="flex:1;padding:30px;text-align:center">
+    <h2>Test muvaffaqiyatli yaratildi</h2>
+    <div class="card" style="text-align:left">
+      <p><b>Nomi:</b> <span id="created-name"></span></p>
+      <p><b>Kod:</b> <span id="created-code"></span></p>
+      <p><b>Link:</b> <input id="created-link" style="width:100%;margin-top:8px" readonly></p>
+    </div>
+    <button class="btn" onclick="copyLink()">Linkni nusxalash</button>
+    <button class="btn green" onclick="go('admin-dash')">Bosh sahifaga</button>
+  </div>
+</div>
+
+<script>
+  // 🗄️ Global O'zgaruvchilar
+  let isAdmin = false;
+  let currentTest = null;
+  let studentAnswers = {};
+  let testData = null;
+  let answerType = 'single';
+  let userInfo = null; // Telegramdan olingan foydalanuvchi ma'lumotlari
+  
+  // ----------------------------------------------------
+  // 🌐 Sahifalarni Boshqarish
+  // ----------------------------------------------------
+  function go(p){
+      document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+      document.getElementById(p).classList.add('active');
+  }
+
+  // Admin Logout
+  function logout(){ 
+      isAdmin=false; 
+      document.getElementById('admin-login-btn').style.display = 'none'; // Admin tugmasini yashiramiz
+      go('start'); 
+  }
+
+  // ----------------------------------------------------
+  // 🔑 Admin Autentifikatsiyasi (Telegram ID orqali)
+  // ----------------------------------------------------
+
+  async function checkAdminAccess() {
+      if (!userInfo || !userInfo.id) return;
+
+      try {
+          const response = await fetch('/.netlify/functions/api/auth', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ telegramId: userInfo.id })
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              if (data.isAdmin) {
+                  isAdmin = true;
+                  // Bosh sahifadagi yashirin turgan admin tugmasini ko'rsatish
+                  const adminBtn = document.getElementById('admin-login-btn');
+                  if (adminBtn) adminBtn.style.display = 'block'; 
+              }
+          }
+      } catch (error) {
+          console.error('Admin tekshiruvida xato:', error);
+      }
+  }
+
+  // ----------------------------------------------------
+  // 📚 Admin Panel Funksiyalari
+  // ----------------------------------------------------
+
+  // 1-qadam → 2-qadam
+  function nextStep(){
+      if (!isAdmin) return Swal.fire('Xato', 'Admin huquqi yo\'q', 'error');
+
+      const name = document.getElementById('test-name').value.trim();
+      const pdfLink = document.getElementById('test-pdf-link').value.trim(); 
+      const qcount = parseInt(document.getElementById('q-count').value);
+      const acount = parseInt(document.getElementById('answers-count').value);
+      
+      if(!name || !pdfLink || qcount<2){ 
+          Swal.fire('Xato','Barcha maydonlarni to‘ldiring va PDF linkini kiriting','warning'); 
+          return; 
+      }
+      
+      currentTest = {
+          name, 
+          pdf: pdfLink, // PDF link
+          questions: qcount, 
+          variants: acount,
+          answers: {}, 
+          code: Math.floor(100000 + Math.random()*900000).toString(),
+          results: []
+      };
+      
+      document.getElementById('admin-pdf').src = currentTest.pdf;
+      buildNav('admin-nav', qcount, n=>adminGoto(n));
+      go('create-2');
+      adminGoto(1);
+  }
+
+  function setType(t){
+      answerType = t;
+      document.querySelectorAll('.tool').forEach(x=>x.classList.remove('active'));
+      event.target.classList.add('active');
+      adminGoto(+document.getElementById('admin-q').textContent);
+  }
+
+  function adminGoto(n){
+      document.querySelectorAll('#admin-nav .n').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('#admin-nav .n')[n-1].classList.add('active');
+      document.getElementById('admin-q').textContent = n;
+      const opts = document.getElementById('admin-opts'); opts.innerHTML='';
+      document.getElementById('admin-textbox').style.display = answerType==='text'?'block':'none';
+      document.getElementById('admin-text').value = currentTest.answers[n]||'';
+      if(answerType!=='text'){
+          'ABCDE'.slice(0,currentTest.variants).split('').forEach(l=>{
+              const d=document.createElement('div');
+              d.className=`o ${answerType==='single'?'circle':'square'}`;
+              d.textContent=l;
+              d.onclick=()=>{ if(answerType==='single') opts.querySelectorAll('.o').forEach(x=>x.classList.remove('active')); d.classList.toggle('active'); saveAdmin(n); };
+              if(currentTest.answers[n]?.includes(l)) d.classList.add('active');
+              opts.appendChild(d);
+          });
+      }
+  }
+
+  function saveAdmin(n){
+      if(answerType==='text') return;
+      const sel = [...document.querySelectorAll('#admin-opts .o.active')].map(x=>x.textContent);
+      currentTest.answers[n] = answerType==='single' ? sel[0] : sel;
+      document.querySelectorAll('#admin-nav .n')[n-1].classList.add('done');
+  }
+  function saveTextAnswer(){
+      const val = document.getElementById('admin-text').value.trim();
+      currentTest.answers[+document.getElementById('admin-q').textContent] = val;
+      document.querySelectorAll('#admin-nav .n')[+document.getElementById('admin-q').textContent-1].classList.add('done');
+  }
+
+  // Testni bazaga saqlash
+  async function saveTest(){
+      if(!isAdmin || !currentTest) return;
+
+      try {
+          const response = await fetch('/.netlify/functions/api/create', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(currentTest)
+          });
+
+          if (response.ok) {
+              const savedTest = await response.json(); 
+              
+              document.getElementById('created-name').textContent = savedTest.name;
+              document.getElementById('created-code').textContent = savedTest.code;
+              document.getElementById('created-link').value = `${window.location.origin}/?test=${savedTest.id}`; 
+              
+              go('test-created');
+              loadTests();
+          } else {
+              Swal.fire('Xato', 'Testni saqlashda muammo yuz berdi.', 'error');
+          }
+      } catch (error) {
+          console.error('Test yaratish API xatosi:', error);
+          Swal.fire('Xato', 'Server bilan bogʻlanishda muammo yuz berdi.', 'error');
+      }
+  }
+
+  // Barcha testlarni serverdan olish
+  async function loadTests(){
+      if (!isAdmin) return;
+      const list = document.getElementById('tests-list'); 
+      list.innerHTML='<p style="text-align:center; padding: 20px;">Yuklanmoqda...</p>';
+
+      try {
+          const response = await fetch('/.netlify/functions/api/admin/tests');
+          
+          if (response.ok) {
+              const tests = await response.json();
+              
+              list.innerHTML=''; 
+              
+              if (tests.length === 0) {
+                  list.innerHTML = '<p style="text-align:center;padding:50px">Hali hech qanday imtihon yaratilmagan.</p>';
+                  return;
+              }
+              
+              tests.forEach(t=>{
+                  const div=document.createElement('div'); div.className='card';
+                  div.innerHTML = `<b>${t.name}</b> • ${t.questions} savol<br>Kod: ${t.code}<br>
+                      <button class="btn small" onclick="share('${t.id}')">Ulashish</button>
+                      <button class="btn green small" onclick="showResults('${t.id}')">Natijalar</button>`; 
+                  list.appendChild(div);
+              });
+              
+          } else {
+              list.innerHTML = '<p style="text-align:center;padding:50px; color:red;">Serverda xato yuz berdi.</p>';
+          }
+
+      } catch (error) {
+          list.innerHTML = '<p style="text-align:center;padding:50px; color:red;">API ga ulanishda muammo.</p>';
+      }
+  }
+
+  // Natijalarni ko'rsatish
+  async function showResults(testId){
+      if (!isAdmin) return;
+      const list = document.getElementById('results-list');
+      list.innerHTML = '<p style="text-align:center; padding: 50px;">Natijalar yuklanmoqda...</p>';
+      go('admin-results');
+
+      try {
+          const response = await fetch('/.netlify/functions/api/admin/results', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ testId })
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              const results = data.results;
+              const totalQuestions = data.totalQuestions;
+              
+              list.innerHTML = ''; 
+
+              if (!results || results.length === 0) {
+                  list.innerHTML = '<p style="text-align:center;padding:50px">Hali hech kim ishlamagan.</p>';
+                  return;
+              }
+              
+              results.sort((a,b)=>b.percentage - a.percentage);
+
+              list.innerHTML = `<div class="card"><b>Jami: ${results.length} ta natija</b></div>`;
+              
+              results.forEach((r,i)=>{
+                  const div=document.createElement('div'); div.className='card';
+                  div.innerHTML = `<b>${i+1}. ${r.name || 'Noma\'lum talaba'}</b> ${r.username || ''}<br>
+                                   ${r.percentage}% (${r.correct}/${totalQuestions})<br>
+                                   <small>${new Date(r.date).toLocaleDateString()}</small>`;
+                  list.appendChild(div);
+              });
+              
+          } else {
+              list.innerHTML = '<p style="text-align:center;padding:50px; color:red;">Natijalarni olishda server xatosi yuz berdi.</p>';
+          }
+
+      } catch (error) {
+          console.error('Natijalarni olish API xatosi:', error);
+          list.innerHTML = '<p style="text-align:center;padding:50px; color:red;">Server bilan bogʻlanishda muammo.</p>';
+      }
+  }
+
+  // Testni ulashish (Telegram bot orqali kirish)
+  function share(id){
+      // Bot linki orqali kirish (WebApp to'g'ridan-to'g'ri link orqali ochiladi)
+      const link = `https://t.me/Imtihonoluvchi01bot?start=test_${id}`;
+      Swal.fire({
+          title: 'Test linki',
+          html: `<input value="${link}" style="width:100%;padding:12px;border-radius:8px;border:1px solid #ccc;font-size:16px" readonly>`,
+          icon: 'info',
+          confirmButtonText: 'Nusxalash',
+          preConfirm: () => {
+              const input = document.querySelector('.swal2-html-container input');
+              input.select();
+              document.execCommand('copy');
+              Swal.fire('Nusxalandi!', '', 'success');
+          }
+      });
+  }
+
+  // Linkni nusxalash
+  function copyLink(){
+      document.getElementById('created-link').select();
+      document.execCommand('copy');
+      Swal.fire('Nusxalandi!','','success');
+  }
+
+  // ----------------------------------------------------
+  // 🎓 Talaba Kirishi (Kod va Link orqali)
+  // ----------------------------------------------------
+  
+  // Kod orqali kirish
+  async function enterByCode(){
+      const code = document.getElementById('code-input').value.trim();
+      if (!code) return Swal.fire('Xato', 'Kodni kiriting', 'warning');
+      
+      try {
+          const response = await fetch('/.netlify/functions/api/test', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code }) // API kod bo'yicha qidiradi
+          });
+
+          if (response.ok) {
+              const test = await response.json();
+              startTest(test); 
+          } else {
+              Swal.fire('Xato', 'Kod topilmadi', 'error');
+          }
+
+      } catch (error) {
+          console.error('API ulanish xatosi:', error);
+          Swal.fire('Xato', 'Server bilan bogʻlanishda muammo yuz berdi.', 'error');
+      }
+  }
+
+  // ID bo'yicha testni olish (Link orqali kirish uchun)
+  async function getTestById(id) {
+      try {
+          const response = await fetch('/.netlify/functions/api/test', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: id }) // API ID bo'yicha qidiradi
+          });
+
+          if (response.ok) {
+              const test = await response.json();
+              startTest(test);
+          } else {
+              // Link orqali kelgan ID xato bo'lsa, bosh sahifada qoldiramiz
+              Swal.fire('Xato', 'Test topilmadi yoki o\'chirilgan', 'error');
+              go('start');
+          }
+      } catch (error) {
+          Swal.fire('Xato', 'Server bilan aloqada muammo.', 'error');
+          go('start');
+      }
+  }
+
+  // Testni boshlash
+  function startTest(t){
+      testData = t;
+      document.getElementById('student-pdf').src = t.pdf;
+      document.getElementById('s-total').textContent = t.questions;
+      studentAnswers = {};
+      buildNav('s-nav', t.questions, n=>studentGoto(n));
+      go('student-test');
+      studentGoto(1);
+  }
+
+  // Savolga o'tish (Talaba)
+  function studentGoto(n){
+      document.querySelectorAll('#s-nav .n').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('#s-nav .n')[n-1].classList.add('active');
+      document.getElementById('s-q').textContent = n;
+      loadStudentQ(n);
+  }
+
+  // Savol variantlarini yuklash (Talaba)
+  function loadStudentQ(n){
+      const correct = testData.answers[n];
+      const opts = document.getElementById('s-opts'); opts.innerHTML='';
+      document.getElementById('s-textbox').style.display='none';
+      
+      // Agar javob 'text' turi bo'lsa
+      if(typeof correct === 'string' && correct.length>5 && testData.answers[n] === correct){ 
+           // Bu yerda text turi aniqlanadi. Oddiy javobni tekshirish uchun bu mantiq yetarli emas.
+           // Biz 'text' turini saqlashda javob qatorini ma'lum uzunlikdan uzun qilib saqladik deb faraz qilamiz.
+          document.getElementById('s-textbox').style.display='block';
+          document.getElementById('s-text').value = studentAnswers[n]||'';
+      } else {
+          // Variantli savol
+          'ABCDE'.slice(0,testData.variants).split('').forEach(l=>{
+              const d=document.createElement('div');
+              d.className=`o ${Array.isArray(correct)?'square':'circle'}`;
+              d.textContent=l;
+              d.onclick=()=>{ if(!Array.isArray(correct)) opts.querySelectorAll('.o').forEach(x=>x.classList.remove('active')); d.classList.toggle('active'); saveStudent(n); };
+              if(studentAnswers[n] && (Array.isArray(studentAnswers[n])?studentAnswers[n].includes(l):studentAnswers[n]===l)) d.classList.add('active');
+              opts.appendChild(d);
+          });
+      }
+  }
+
+  // Variantli javobni saqlash
+  function saveStudent(n){
+      const sel = [...document.querySelectorAll('#s-opts .o.active')].map(x=>x.textContent);
+      // Agar to'g'ri javob massiv bo'lsa (multiple), saqlangan javob ham massiv, aks holda bitta element
+      studentAnswers[n] = testData.answers[n] && Array.isArray(testData.answers[n]) ? sel : sel[0];
+      document.querySelectorAll('#s-nav .n')[n-1].classList.add('done');
+  }
+
+  // Matnli javobni saqlash
+  function saveStudentText(){
+      studentAnswers[+document.getElementById('s-q').textContent] = document.getElementById('s-text').value.trim();
+      document.querySelectorAll('#s-nav .n')[+document.getElementById('s-q').textContent-1].classList.add('done');
+  }
+
+  // Testni tugatish va natijalarni serverga yuborish
+  async function finishTest(){
+      Swal.fire({
+          title:'Testni tugatish?',
+          text: "Javoblaringizni qayta tekshirib oling. Tugatilganidan so'ng natija saqlanadi.",
+          showCancelButton:true,
+          confirmButtonText: 'Tugatish',
+          cancelButtonText: 'Bekor qilish'
+      }).then(async (r) => {
+          if(!r.isConfirmed) return;
+
+          // Global userInfo dan ma'lumotlarni olish
+          const studentInfoToSend = {
+              name: userInfo?.name || 'Noma\'lum Talaba',
+              username: userInfo?.username || '',
+              id: userInfo?.id || 'NO_ID', // Telegram ID ni saqlash muhim
+              date: new Date().toISOString()
+          };
+          
+          const payload = {
+              testId: testData.id, 
+              studentAnswers: studentAnswers,
+              userInfo: studentInfoToSend 
+          };
+
+          try {
+              const response = await fetch('/.netlify/functions/api/student/finish', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload)
+              });
+
+              if (response.ok) {
+                  const result = await response.json();
+                  
+                  document.getElementById('perc').textContent = result.percentage + '%';
+                  document.getElementById('cor').textContent = result.correct;
+                  document.getElementById('wr').textContent = result.wrong;
+                  
+                  // Natija gridini yuklash uchun serverdan kelgan javoblarni ishlatish kerak edi.
+                  // Hozircha faqat umumiy natijani ko'rsatamiz.
+                  
+                  go('student-result');
+
+              } else {
+                  Swal.fire('Xato', 'Natijalarni saqlashda muammo yuz berdi.', 'error');
+              }
+
+          } catch (error) {
+              console.error('Tugatish API xatosi:', error);
+              Swal.fire('Xato', 'Server bilan bogʻlanishda muammo yuz berdi.', 'error');
+          }
+      });
+  }
+
+  // Navigatsiya tugmalarini yaratish
+  function buildNav(id, count, fn){
+      const nav=document.getElementById(id); nav.innerHTML='';
+      for(let i=1;i<=count;i++){
+          const b=document.createElement('div'); b.className='n'; b.textContent=i; b.onclick=()=>fn(i); nav.appendChild(b);
+      }
+  }
+
+  // ----------------------------------------------------
+  // ⚙️ Sahifani Yuklash (WebApp va Kirish mantig'i)
+  // ----------------------------------------------------
+
+  window.onload = function() {
+      // PDF input tipini file dan url ga o'zgartirish (HTML da o'chirilmagan bo'lsa)
+      const pdfInput = document.getElementById('test-pdf');
+      if (pdfInput) {
+          pdfInput.type = 'url';
+          pdfInput.id = 'test-pdf-link';
+      }
+
+      // Telegram WebApp ma'lumotlarini olish
+      if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe.user) {
+          Telegram.WebApp.ready();
+          Telegram.WebApp.expand();
+          
+          const unsafeUser = Telegram.WebApp.initDataUnsafe.user;
+          userInfo = {
+              id: unsafeUser.id.toString(), // ID ni string qilib saqlash
+              name: unsafeUser.first_name,
+              username: unsafeUser.username || '',
+              date: new Date().toISOString()
+          };
+          
+          // Admin huquqini tekshirish
+          checkAdminAccess();
+      }
+      
+      // Link orqali test IDsi kelgan bo'lsa, to'g'ridan-to'g'ri yuklash
+      const urlParams = new URLSearchParams(location.search);
+      if(urlParams.get('test')){
+          getTestById(urlParams.get('test')); 
+      }
+  };
+</script>
+</body>
+</html>

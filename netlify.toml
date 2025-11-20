@@ -1,0 +1,10 @@
+# netlify.toml
+[build]
+  # Saytning asosiy fayllari joylashgan papka
+  publish = "."
+  
+[functions]
+  # Funksiyalar papkasining manzili
+  directory = "functions"
+  # Node.js versiyasini belgilash (tavsiya etiladi)
+  node_bundler = "esbuild"
