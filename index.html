@@ -581,30 +581,40 @@
   // 🎓 Talaba Kirishi (Kod va Link orqali)
   // ----------------------------------------------------
   
-  // Kod orqali kirish
   async function enterByCode(){
-      const code = document.getElementById('code-input').value.trim();
-      if (!code) return Swal.fire('Xato', 'Kodni kiriting', 'warning');
-      
-      try {
-          const response = await fetch('/.netlify/functions/test', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ code }) // API kod bo'yicha qidiradi
-          });
+      const code = document.getElementById('code-input').value.trim();
+      if (!code) return Swal.fire('Xato', 'Kodni kiriting', 'warning');
+      
+      // 🔑 1. ADMIN TEKSHIRUVI: Agar maxfiy kod bo'lsa
+      if (code === '12345') {
+          isAdmin = true;
+          // Admin dashboardiga kirish tugmasini ko'rsatish
+          document.getElementById('admin-login-btn').style.display = 'block';
+          Swal.fire('Muvaffaqiyatli', 'Admin ruxsati berildi!', 'success');
+          document.getElementById('code-input').value = ''; // Kiritilgan kodni o'chiramiz
+          return; // Funksiyani shu yerda tugatamiz
+      }
 
-          if (response.ok) {
-              const test = await response.json();
-              startTest(test); 
-          } else {
-              Swal.fire('Xato', 'Kod topilmadi', 'error');
-          }
+      // 📄 2. TALABA TEKSHIRUVI: Agar maxfiy kod bo'lmasa, test kodini tekshiramiz
+      try {
+          const response = await fetch('/.netlify/functions/test', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code }) // API kod bo'yicha qidiradi
+          });
 
-      } catch (error) {
-          console.error('API ulanish xatosi:', error);
-          Swal.fire('Xato', 'Server bilan bogʻlanishda muammo yuz berdi.', 'error');
-      }
-  }
+          if (response.ok) {
+              const test = await response.json();
+              startTest(test); 
+          } else {
+              Swal.fire('Xato', 'Kod topilmadi', 'error');
+          }
+
+      } catch (error) {
+          console.error('API ulanish xatosi:', error);
+          Swal.fire('Xato', 'Server bilan bogʻlanishda muammo yuz berdi.', 'error');
+      }
+  }
 
   // ID bo'yicha testni olish (Link orqali kirish uchun)
   async function getTestById(id) {
@@ -755,37 +765,38 @@
   // ----------------------------------------------------
 
   window.onload = function() {
-      // PDF input tipini file dan url ga o'zgartirish (HTML da o'chirilmagan bo'lsa)
-      const pdfInput = document.getElementById('test-pdf');
-      if (pdfInput) {
-          pdfInput.type = 'url';
-          pdfInput.id = 'test-pdf-link';
-      }
+      // PDF input tipini url ga o'zgartirish (O'zgarishsiz)
+      const pdfInput = document.getElementById('test-pdf');
+      if (pdfInput) {
+          pdfInput.type = 'url';
+          pdfInput.id = 'test-pdf-link';
+      }
 
-      // Telegram WebApp ma'lumotlarini olish
-      if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe.user) {
-          Telegram.WebApp.ready();
-          Telegram.WebApp.expand();
-          
-          const unsafeUser = Telegram.WebApp.initDataUnsafe.user;
-          userInfo = {
-              id: unsafeUser.id.toString(), // ID ni string qilib saqlash
-              name: unsafeUser.first_name,
-              username: unsafeUser.username || '',
-              date: new Date().toISOString()
-          };
-          
-          // Admin huquqini tekshirish
-          checkAdminAccess();
-      }
-      
-      // Link orqali test IDsi kelgan bo'lsa, to'g'ridan-to'g'ri yuklash
-      const urlParams = new URLSearchParams(location.search);
-      if(urlParams.get('test')){
-          getTestById(urlParams.get('test')); 
-      }
-  };
+      // Telegram WebApp ma'lumotlarini olish (O'zgarishsiz)
+      if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe.user) {
+          Telegram.WebApp.ready();
+          Telegram.WebApp.expand();
+          
+          const unsafeUser = Telegram.WebApp.initDataUnsafe.user;
+          userInfo = {
+              id: unsafeUser.id.toString(), // ID ni string qilib saqlash
+              name: unsafeUser.first_name,
+              username: unsafeUser.username || '',
+              date: new Date().toISOString()
+          };
+          
+          // checkAdminAccess() endi chaqirilmaydi!
+          // Faqat admin kirish tugmasi link orqali kelmagan bo'lsa yashiriladi.
+      }
+      
+      // Link orqali test IDsi kelgan bo'lsa, to'g'ridan-to'g'ri yuklash (O'zgarishsiz)
+      const urlParams = new URLSearchParams(location.search);
+      if(urlParams.get('test')){
+          getTestById(urlParams.get('test')); 
+      }
+  };
 </script>
 </body>
 
 </html>
+
