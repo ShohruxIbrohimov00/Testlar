@@ -1,10 +1,44 @@
-# netlify.toml
 [build]
-  # Saytning asosiy fayllari joylashgan papka
   publish = "."
+  # Funksiyalar uchun faqat asosiy papkani ko'rsatamiz
+  functions = "functions" 
   
 [functions]
-  # Funksiyalar papkasining manzili
   directory = "functions"
-  # Node.js versiyasini belgilash (tavsiya etiladi)
   node_bundler = "esbuild"
+
+# Funksiyalarga chaqiruvlarni qayta yo'naltirish
+# Bu Netlify'ga URL orqali papka ichidagi fayllarni topishga yordam beradi
+
+# ASOSIY API FUNKSIYALARI
+[[redirects]]
+  from = "/.netlify/functions/api/auth"
+  to = "/.netlify/functions/auth"
+  status = 200
+
+[[redirects]]
+  from = "/.netlify/functions/api/create"
+  to = "/.netlify/functions/create"
+  status = 200
+
+[[redirects]]
+  from = "/.netlify/functions/api/test"
+  to = "/.netlify/functions/test"
+  status = 200
+
+# ADMIN FUNKSIYALARI
+[[redirects]]
+  from = "/.netlify/functions/api/admin/tests"
+  to = "/.netlify/functions/admin-tests"
+  status = 200
+
+[[redirects]]
+  from = "/.netlify/functions/api/admin/results"
+  to = "/.netlify/functions/admin-results"
+  status = 200
+
+# TALABA FUNKSIYASI
+[[redirects]]
+  from = "/.netlify/functions/api/student/finish"
+  to = "/.netlify/functions/student-finish"
+  status = 200
