@@ -1,40 +1,28 @@
 // functions/api/admin/tests.js
-const faunadb = require('faunadb');
-const q = faunadb.query;
-const client = new faunadb.Client({ secret: process.env.FAUNA_SECRET });
 
-exports.handler = async (event) => {
+const connectToDatabase = require('../../utils/db');
+const Test = require('../../models/Test');
+
+exports.handler = async (event, context) => {
     if (event.httpMethod !== 'GET') {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
+    context.callbackWaitsForEmptyEventLoop = false;
 
     try {
-        // FaunaDB da barcha 'Tests' ni topish
-        const result = await client.query(
-            q.Map(
-                q.Paginate(q.Match(q.Index('all_tests'))), // 'all_tests' indeksini yaratish kerak!
-                q.Lambda('ref', q.Get(q.Var('ref')))
-            )
-        );
-
-        // Faqat kerakli maydonlarni ajratib olish
-        const tests = result.data.map(item => ({
-            id: item.ref.id,
-            name: item.data.name,
-            code: item.data.code,
-            questions: item.data.questions // Savollar sonini ko'rsatish uchun
-        }));
+        await connectToDatabase();
+        
+        // Barcha testlarni (faqat asosiy ma'lumotlarni) olish
+        const tests = await Test.find({})
+            .select('name code questions _id')
+            .sort({ createdAt: -1 }); // Eng yangilarini birinchi ko'rsatish
 
         return {
             statusCode: 200,
-            body: JSON.stringify(tests),
+            body: JSON.stringify(tests)
         };
-
     } catch (error) {
-        // Agar baza bo'sh bo'lsa yoki xato bo'lsa, bo'sh massiv qaytaramiz
-        return {
-            statusCode: 200, 
-            body: JSON.stringify([]),
-        };
+        console.error('Fetch all tests error:', error);
+        return { statusCode: 500, body: JSON.stringify({ error: 'Failed to fetch tests list.' }) };
     }
 };
