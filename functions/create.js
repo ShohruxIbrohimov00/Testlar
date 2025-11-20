@@ -1,7 +1,7 @@
 // functions/api/create.js
 
-const connectToDatabase = require('../utils/db');
-const Test = require('../models/Test');
+const connectToDatabase = require('./utils/db');
+const Test = require('./models/Test');
 
 exports.handler = async (event, context) => {
     if (event.httpMethod !== 'POST') {
