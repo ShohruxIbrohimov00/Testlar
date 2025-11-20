@@ -2,7 +2,7 @@
 
 exports.handler = async (event, context) => {
     // Netlify'dagi maxfiy o'zgaruvchidan admin ID ni olamiz
-    const ADMIN_TELEGRAM_ID = process.env.ADMIN_TELEGRAM_ID;
+    const ADMIN_TELEGRAM_ID = process.ADMIN_TELEGRAM_ID;
 
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
