@@ -1,41 +1,39 @@
 // functions/api/admin/results.js
-const faunadb = require('faunadb');
-const q = faunadb.query;
-const client = new faunadb.Client({ secret: process.env.FAUNA_SECRET });
 
-exports.handler = async (event) => {
+const connectToDatabase = require('../../utils/db');
+const Test = require('../../models/Test');
+const mongoose = require('mongoose');
+
+exports.handler = async (event, context) => {
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
+    context.callbackWaitsForEmptyEventLoop = false;
 
     try {
+        await connectToDatabase();
         const { testId } = JSON.parse(event.body);
 
-        // 1. FaunaDB dan testni ID orqali olish
-        const testRef = q.Ref(q.Collection('Tests'), testId);
-        const testData = await client.query(
-            q.Get(testRef)
-        );
-        
-        // 2. Natijalar massivini olish
-        const results = testData.data.results || [];
-        const totalQuestions = testData.data.questions;
+        if (!testId || !mongoose.Types.ObjectId.isValid(testId)) {
+            return { statusCode: 400, body: JSON.stringify({ error: 'Invalid Test ID.' }) };
+        }
 
-        // 3. Natijalarni front-endga qaytarish
+        // Testni topish va faqat Natijalar (results) va Savollar sonini olish
+        const test = await Test.findById(testId).select('results questions');
+
+        if (!test) {
+            return { statusCode: 404, body: JSON.stringify({ error: 'Test not found.' }) };
+        }
+
         return {
             statusCode: 200,
             body: JSON.stringify({ 
-                results: results,
-                totalQuestions: totalQuestions 
-            }),
+                results: test.results,
+                totalQuestions: test.questions 
+            })
         };
-
     } catch (error) {
-        console.error('Natijalarni olishda xato:', error);
-        // Test topilmagan holatda ham bo'sh massiv qaytarish mumkin
-        return {
-            statusCode: 200, 
-            body: JSON.stringify({ results: [], totalQuestions: 0 }),
-        };
+        console.error('Fetch results error:', error);
+        return { statusCode: 500, body: JSON.stringify({ error: 'Failed to fetch results.' }) };
     }
 };
