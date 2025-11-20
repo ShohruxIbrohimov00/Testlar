@@ -1,7 +1,7 @@
 // functions/api/admin/tests.js
 
-const connectToDatabase = require('./utils/db');
-const Test = require('./models/Test');
+const connectToDatabase = require('./db');
+const Test = require('./models-Test');
 
 exports.handler = async (event, context) => {
     if (event.httpMethod !== 'GET') {
