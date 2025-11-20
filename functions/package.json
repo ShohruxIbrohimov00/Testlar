@@ -6,7 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "echo 'Installing functions dependencies...'" 
-    // Bu satr deployni majburlashga yordam beradi
   },
   "dependencies": {
     "mongoose": "^6.12.3"
