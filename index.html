@@ -347,7 +347,7 @@
       if (!userInfo || !userInfo.id) return;
 
       try {
-          const response = await fetch('/.netlify/functions/api/auth', {
+          const response = await fetch('/.netlify/functions/auth', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ telegramId: userInfo.id })
@@ -444,7 +444,7 @@
       if(!isAdmin || !currentTest) return;
 
       try {
-          const response = await fetch('/.netlify/functions/api/create', {
+          const response = await fetch('/.netlify/functions/create', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(currentTest)
@@ -475,7 +475,7 @@
       list.innerHTML='<p style="text-align:center; padding: 20px;">Yuklanmoqda...</p>';
 
       try {
-          const response = await fetch('/.netlify/functions/api/admin/tests');
+          const response = await fetch('/.netlify/functions/admin-tests');
           
           if (response.ok) {
               const tests = await response.json();
@@ -512,7 +512,7 @@
       go('admin-results');
 
       try {
-          const response = await fetch('/.netlify/functions/api/admin/results', {
+          const response = await fetch('/.netlify/functions/admin-results', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ testId })
@@ -587,7 +587,7 @@
       if (!code) return Swal.fire('Xato', 'Kodni kiriting', 'warning');
       
       try {
-          const response = await fetch('/.netlify/functions/api/test', {
+          const response = await fetch('/.netlify/functions/test', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ code }) // API kod bo'yicha qidiradi
@@ -609,7 +609,7 @@
   // ID bo'yicha testni olish (Link orqali kirish uchun)
   async function getTestById(id) {
       try {
-          const response = await fetch('/.netlify/functions/api/test', {
+          const response = await fetch('/.netlify/functions/test', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ id: id }) // API ID bo'yicha qidiradi
@@ -713,7 +713,7 @@
           };
 
           try {
-              const response = await fetch('/.netlify/functions/api/student/finish', {
+              const response = await fetch('/.netlify/functions/student-finish', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify(payload)
@@ -787,4 +787,5 @@
   };
 </script>
 </body>
+
 </html>
